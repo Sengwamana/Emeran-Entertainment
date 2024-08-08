@@ -1,16 +1,17 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import React from 'react';
+import { Link } from 'react-router-dom';
+import './Footer.css';
 
 const Footer = () => {
   return (
-    <footer className='text-center bg-neutral-600 bg-opacity-35 text-neutral-400 py-2'>
-        <div className='flex items-center justify-center gap-4'>
-          <Link to="/" >About</Link>
-          <Link to="/">Contact</Link>
+    <footer className='footer text-center py-8'>
+        <div className='footer-links flex items-center justify-center gap-8'>
+          <Link to="/about" className="footer-link">About</Link>
+          <Link to="/contact" className="footer-link">Contact</Link>
         </div>
-        <p className='text-sm'>Created By Emeran Tech</p>
+        <p className='footer-credit text-sm mt-6'>Created By Emeran Tech</p>
     </footer>
-  )
+  );
 }
 
-export default Footer
+export default Footer;

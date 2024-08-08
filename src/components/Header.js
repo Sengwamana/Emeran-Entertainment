@@ -4,23 +4,30 @@ import { IoSearchOutline } from "react-icons/io5";
 import logo from '../assets/logo.png';
 import userIcon from '../assets/userIcon.svg';
 import { navigation } from '../contants/navigation';
-import './Header.css'; // Assuming you have a CSS file for styling
+import './Header.css';
 
 const Header = () => {
     const location = useLocation();
-    const removeSpace = location?.search?.slice(3)?.split("%20")?.join(" ");
-    const [searchInput, setSearchInput] = useState(removeSpace);
+    const query = new URLSearchParams(location.search).get('q');
+    const [searchInput, setSearchInput] = useState(query || '');
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const navigate = useNavigate();
-   
-    useEffect(() => {
-        if (searchInput) {
-            navigate(`/search?q=${searchInput}`);
+
+    const handleSearch = () => {
+        if (searchInput.trim()) {
+            navigate(`/search?q=${encodeURIComponent(searchInput.trim())}`);
         }
-    }, [searchInput]);
+    };
+
+    useEffect(() => {
+        if (query !== searchInput) {
+            setSearchInput(query || '');
+        }
+    }, [query]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        handleSearch();
     };
 
     const toggleMobileMenu = () => {
@@ -28,7 +35,7 @@ const Header = () => {
     };
 
     return (
-        <header className='header fixed top-0 w-full h-20 bg-black bg-opacity-70 z-40 shadow-lg'>
+        <header className={`header fixed top-0 w-full h-20 bg-black bg-opacity-70 z-40 shadow-lg ${isMobileMenuOpen ? 'menu-open' : ''}`}>
             <div className='container mx-auto px-4 flex items-center justify-between h-full'>
                 <Link to="/">
                     <img
@@ -38,12 +45,13 @@ const Header = () => {
                     />
                 </Link>
 
-                <nav className='header-nav hidden lg:flex items-center gap-6'>
+                <nav className={`header-nav-mobile ${isMobileMenuOpen ? 'active' : ''}`}>
                     {navigation.map((nav, index) => (
                         <NavLink
                             key={nav.label + "header" + index}
                             to={nav.href}
-                            className={({ isActive }) => `nav-link px-3 ${isActive ? "active" : ""}`}
+                            className={({ isActive }) => `nav-link ${isActive ? "active" : ""}`}
+                            onClick={toggleMobileMenu}
                         >
                             {nav.label}
                         </NavLink>
@@ -51,11 +59,11 @@ const Header = () => {
                 </nav>
 
                 <div className='header-actions flex items-center gap-6'>
-                    <form className='header-search flex items-center gap-2' onSubmit={handleSubmit}>
+                    <form className='header-search hidden lg:flex items-center gap-2' onSubmit={handleSubmit}>
                         <input
                             type='text'
                             placeholder='Search here...'
-                            className='search-input bg-transparent px-4 py-2 outline-none border-none hidden lg:block'
+                            className='search-input bg-transparent px-4 py-2 outline-none border-none'
                             onChange={(e) => setSearchInput(e.target.value)}
                             value={searchInput}
                         />
@@ -68,24 +76,15 @@ const Header = () => {
                     </div>
                 </div>
 
-                <div className='hamburger lg:hidden' onClick={toggleMobileMenu}>
+                <div 
+                    className={`hamburger lg:hidden ${isMobileMenuOpen ? 'active' : ''}`} 
+                    onClick={toggleMobileMenu}
+                >
                     <div></div>
                     <div></div>
                     <div></div>
                 </div>
             </div>
-            <nav className={`header-nav-mobile ${isMobileMenuOpen ? 'active' : ''}`}>
-                {navigation.map((nav, index) => (
-                    <NavLink
-                        key={nav.label + "header" + index}
-                        to={nav.href}
-                        className={({ isActive }) => `nav-link ${isActive ? "active" : ""}`}
-                        onClick={toggleMobileMenu}
-                    >
-                        {nav.label}
-                    </NavLink>
-                ))}
-            </nav>
         </header>
     );
 };
